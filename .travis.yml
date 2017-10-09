@@ -24,6 +24,9 @@ matrix:
     - compiler: ": #GHC 8.0.2"
       env: STACK_YAML=stack-travis.yaml RESOLVER=lts-9.2 GHCVER=8.0.1 COVERAGE=1 FLAGS="--flag toysolver:BuildToyFMF --flag toysolver:BuildSamplePrograms --flag toysolver:BuildMiscPrograms --flag toysolver:TestCBC --flag toysolver:TestGlpsol --flag toysolver:TestLPSolve --flag=toysolver:OpenCL"
       addons: {apt: {packages: [libgmp-dev,coinor-cbc,glpk-utils,lp-solve,c2hs,ocl-icd-opencl-dev]}}
+    - compiler: ": #GHC 8.0.2"
+      os: osx
+      env: STACK_YAML=stack-travis.yaml RESOLVER=lts-9.2 GHCVER=8.0.1 COVERAGE=1 FLAGS="--flag toysolver:BuildToyFMF --flag toysolver:BuildSamplePrograms --flag toysolver:BuildMiscPrograms --flag=toysolver:OpenCL"
     - compiler: ": #GHC 7.10.3"
       env: STACK_YAML=stack-travis-ghc-7.10.yaml RESOLVER=lts-6.33 GHCVER=7.10.3 FLAGS="--flag toysolver:BuildToyFMF --flag toysolver:BuildSamplePrograms --flag toysolver:BuildMiscPrograms --flag toysolver:TestCBC --flag toysolver:TestGlpsol --flag toysolver:TestLPSolve --flag=toysolver:OpenCL"
       addons: {apt: {packages: [libgmp-dev,coinor-cbc,glpk-utils,lp-solve,c2hs,ocl-icd-opencl-dev]}}
@@ -40,7 +43,12 @@ before_install:
 # Download and unpack the stack executable
 - mkdir -p ~/.local/bin
 - export PATH=$HOME/.local/bin:$PATH
-- travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+- |
+  if [ `uname` = "Darwin" ]; then
+    travis_retry curl -L https://www.stackage.org/stack/osx-x86_64 | tar xz --strip-components=1 -C ~/.local/bin '*/stack'
+  else
+    travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+  fi  
 
 install:
 # Build dependencies
